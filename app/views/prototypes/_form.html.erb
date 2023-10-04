@@ -1,4 +1,6 @@
 <%= form_with model: prototype , local: true do |f|%>
+
+
   <div class="field">
     <%= f.label :title, "プロトタイプの名称" %><br />
     <%= f.text_field :title, id:"prototype_title" %>
@@ -22,4 +24,8 @@
   <div class="actions">
     <%= f.submit "保存する", class: :form_btn  %>
   </div>
+
+  <%= redirect_to root_path %>
+
+
 <% end %>
