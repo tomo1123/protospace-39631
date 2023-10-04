@@ -2,13 +2,13 @@
   <div class="inner">
     <div class="prototype__wrapper">
       <p class="prototype__hedding">
-        <%= @prototype_title %>
+        <%= @prototype.title %>
       </p>
       <%= link_to "by #{@prototype.user.name}さん", user_path(@prototype.user), class: "prototype__user" %> 
-      <% if user_signed_in? && current_user.id == @prototype.user.id %>
+      <% if current_user == @prototype.user %>
         <div class="prototype__manage">
-           <%= link_to "編集する", edit_prototype_path(@prototype), class: "prototype__btn" %>
-           <%= link_to "削除する", prototype_path(@prototype), method: :delete, class: "prototype__btn" %>
+           <%= link_to "編集する", edit_prototype_path(@prototype), class: :prototype__btn %>
+           <%= link_to "削除する", prototype_path(@prototype), method: :delete, class: :prototype__btn %>
         </div>
       <% end %>
         <div class="prototype__image">
@@ -18,20 +18,20 @@
           <div class="prototype__detail">
             <p class="detail__title">キャッチコピー</p>
             <p class="detail__message">
-              <%= link_to @prototype_catch_copy %>
+              <%= link_to @prototype.catch_copy %>
             </p>
           </div>
           <div class="prototype__detail">
             <p class="detail__title">コンセプト</p>
             <p class="detail__message">
-              <%= @prototype_concept %>
+              <%= @prototype.concept %>
             </p>
           </div>
         </div>
         <div class="prototype__comments">
             
             <% if user_signed_in? %>
-              <%= form_with(model: [@prototype, @comment], local: true) do |f|%>
+              <%= form_with model: [@prototype, @comment], local: true do |f|%>
                   <div class="field">
                     <%= f.label :comment, "コメント" %><br />
                     <%= f.text_field :comment, id:"comment_content" %>
@@ -46,10 +46,10 @@
 
           
           <ul class="comments_lists">
-            <% @prototype.comments.each do |comment| %>
+            <% @comments.each do |comment| %>
               <li class="comments_lists">
                   <%= comment.comment %>
-                  <%= link_to "#{@prototype.user.name}", user_path, class: :comment_user %>
+                  <%= link_to "#{comment.user.name}さん", user_path(comment.user), class: :comment_user %>
               </li>
             <% end %>
           </ul>
