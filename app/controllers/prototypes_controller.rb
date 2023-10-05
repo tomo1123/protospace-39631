@@ -1,51 +1,14 @@
 class PrototypesController < ApplicationController
-before_action :authenticate_user!, only: [:new, :create]
-before_action :move_to_index, except: [:index, :show]
-before_action :contributor_confirmation, only: [:edit, :update, :destroy]
+  before_action :set_prototype, except: [:index, :new, :create]
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :contributor_confirmation, only: [:edit, :update, :destroy]
+
   def index
     @prototypes = Prototype.includes(:user)
   end
 
-  def edit
-    @prototype = Prototype.find(params[:id])
-    unless @prototype.user_id == current_user.id
-      redirect_to root_path
-    end
-  end
-
-  def update
-    @prototype = Prototype.find(params[:id])
-    if @prototype.update(prototype_params)
-      redirect_to prototype_path(@prototype.id)
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
- def destroy
-    if @prototype.destroy
-      redirect_to root_path
-    else
-      redirect_to root_path
-    end 
- end
- 
-
-
-
-  def show
-    @prototype = Prototype.find(params[:id])
-    @comment = Comment.new
-    @comments = @prototype.comments.includes(:user)
-  end
-
   def new
     @prototype = Prototype.new
-    if @prototype.new(prototype_params)
-      redirect_to prototype_path(@prototype.id)
-    else
-      render :edit, status: :unprocessable_entity
-    end
   end
 
   def create
@@ -56,20 +19,42 @@ before_action :contributor_confirmation, only: [:edit, :update, :destroy]
       render :new, status: :unprocessable_entity
     end
   end
-  
-  private
-  def prototype_params
-    params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
-    
+
+  def show
+    @comment = Comment.new
+    @comments = @prototype.comments
   end
-  def move_to_index
-    unless user_signed_in?
-      redirect_to action: :index
+
+  def edit
+  end
+
+  def update
+    if @prototype.update(prototype_params)
+      redirect_to prototype_path(@prototype)
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
-  def contributor_confirmation
-    @prototype = Prototype.find(params[:id])
-    redirect_to root_path unless current_user == @prototype.user  
-  
 
+  def destroy
+    if @prototype.destroy
+      redirect_to root_path
+    else
+      redirect_to root_path
+    end
+  end
+
+  private
+
+  def prototype_params
+    params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
+  end
+
+  def set_prototype
+    @prototype = Prototype.find(params[:id])
+  end
+
+  def contributor_confirmation
+    redirect_to root_path unless current_user == @prototype.user
+  end
 end
