@@ -3,14 +3,14 @@ before_action :authenticate_user!, only: [:new, :create]
 before_action :move_to_index, except: [:index, :show]
 
   def index
-    @prototypes = Prototype.all
+    @prototypes = Prototype.includes(:user)
   end
 
   def edit
     @prototype = Prototype.find(params[:id])
-    #unless @prototype.user_id == current_user.id
-      #redirect_to root_path
-    #end
+    unless @prototype.user_id == current_user.id
+      redirect_to root_path
+    end
   end
 
   def update
@@ -18,13 +18,13 @@ before_action :move_to_index, except: [:index, :show]
     if @prototype.update(prototype_params)
       redirect_to prototype_path(@prototype.id)
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
  def destroy
-  #prototype = Prototype.find(params[:id])
-  #prototype.destroy
-  #redirect_to root_path
+   #prototype = Prototype.find(params[:id])
+   #prototype.destroy
+   #redirect_to root_path
  end
 
 
@@ -37,6 +37,11 @@ before_action :move_to_index, except: [:index, :show]
 
   def new
     @prototype = Prototype.new
+    if @prototype.new(prototype_params)
+      redirect_to prototype_path(@prototype.id)
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def create
@@ -44,7 +49,7 @@ before_action :move_to_index, except: [:index, :show]
     if @prototype.save
       redirect_to root_path
     else
-      render :root_path
+      render :new, status: :unprocessable_entity
     end
   end
   
