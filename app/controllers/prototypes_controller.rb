@@ -1,7 +1,7 @@
 class PrototypesController < ApplicationController
 before_action :authenticate_user!, only: [:new, :create]
 before_action :move_to_index, except: [:index, :show]
-
+before_action :contributor_confirmation, only: [:edit, :update, :destroy]
   def index
     @prototypes = Prototype.includes(:user)
   end
@@ -21,11 +21,15 @@ before_action :move_to_index, except: [:index, :show]
       render :edit, status: :unprocessable_entity
     end
   end
+
  def destroy
-   #prototype = Prototype.find(params[:id])
-   #prototype.destroy
-   #redirect_to root_path
+    if @prototype.destroy
+      redirect_to root_path
+    else
+      redirect_to root_path
+    end 
  end
+ 
 
 
 
@@ -60,9 +64,12 @@ before_action :move_to_index, except: [:index, :show]
   end
   def move_to_index
     unless user_signed_in?
-      redirect_to action: :edit
+      redirect_to action: :index
     end
   end
+  def contributor_confirmation
+    @prototype = Prototype.find(params[:id])
+    redirect_to root_path unless current_user == @prototype.user  
   
 
 end
